@@ -25,7 +25,9 @@ def property_new(collection):
   user_input_valid = False
   while not user_input_valid:
     type_input = input(
-      'Select a property type:\n(O) Object   | (C) Cotrolled Object   | (S) String\n(B) Boolean   | (N) Number   | (I) ObjectID\n'
+      'Select a property type:\n'+
+      '(I) Object ID   | (S) String   | (N) Number   | (B) Boolean\n'+
+      '(A) Any         | (O) Object   | (C) Controlled Object\n'
     )
     if type_input in ['O', 'o']:
       user_input_valid = True
@@ -50,6 +52,10 @@ def property_new(collection):
     elif type_input in ['I', 'i']:
       user_input_valid = True
       prop_type = 'ObjectID'
+      del type_input
+    elif type_input in ['A', 'a']:
+      user_input_valid = True
+      prop_type = 'Any'
       del type_input
     else:
       print(

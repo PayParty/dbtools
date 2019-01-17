@@ -48,6 +48,35 @@ class ControlledObjectProperty:
       'ControlledObjectProperty object \'{name}\' containing {cont}+{prop_count} properties.'.format(name=self.name, cont=controller_count, prop_count=len(self.properties))
     )
 
+  def compare(self, document_property):
+
+    if document_property:
+      
+      if isinstance(document_property, dict):
+        
+        object_property = document_property
+        result = {}
+
+        result[self.controller.name] = self.controller.compare(object_property.pop(self.controller.name, None))
+
+        for prop in self.properties:
+          result[prop.name] = prop.compare(object_property.pop(prop.name, None))
+        
+        while not object_property == {}:
+          result[object_property.popitem()[0]] = 'unexpected'
+
+        return result
+
+      else:
+        return 'invalid type'
+    
+    else:
+
+      if self.optional:
+        return None
+      else:
+        return 'missing property'
+
   def to_plain(self):
   # to_plain
   #
@@ -98,6 +127,10 @@ class ControlledObjectProperty:
   def properties(self, new_properties):
     if isinstance(new_properties, list):
       self.__properties = new_properties
+
+  def add_properties(self, new_properties):
+    if isinstance(new_properties, list):
+      self.__properties.extend(new_properties)
   
   @property
   def optional(self):

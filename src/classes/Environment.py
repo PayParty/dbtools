@@ -1,4 +1,6 @@
 from .Server import Server
+from json import dumps
+from pprint import pprint
 
 class Environment:
 # Environment
@@ -37,6 +39,16 @@ class Environment:
     return (
       'Environment object \'{name}\' containing {s_count} server(s)'.format(name=self.name, s_count=len(self.servers))
     )
+
+  def analyze(self):
+
+    analysis = list(map(
+      lambda server: server.analyze()
+    , self.servers))
+
+    output = open('test_diag.log', 'w')
+    output.write(dumps(analysis))
+    output.close()
   
   def to_plain(self):
   # to_plain

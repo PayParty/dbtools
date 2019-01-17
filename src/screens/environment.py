@@ -126,15 +126,20 @@ def environment_view(environment):
   user_input_valid = False
   while not user_input_valid:
     user_input = input(
-      '(N) New server   | (O#) Open server by index   | (S) Save   | (X) Close environment\n'
+      '(N) New server   | (O#) Open server by index   | (R) Run analysis\n'+
+      '(S) Save environment                           | (Q) Close environment without saving\n'
     )
     if user_input in ['N', 'n']:
       user_input_valid = True
       return ('server_new', environment, True)
-    if user_input in ['S', 's']:
+    elif user_input in ['S', 's']:
       user_input_valid = True
       return ('environment_save', environment, True)
-    elif user_input in ['X', 'x']:
+    elif user_input in ['R', 'r']:
+      user_input_valid = True
+      environment.analyze()
+      return (None, None, True)
+    elif user_input in ['Q', 'q']:
       user_input_valid = True
       return (None, None, False)
     elif len(user_input) > 1:

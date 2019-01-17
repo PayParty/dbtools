@@ -1,4 +1,5 @@
 from .Collection import Collection
+from pymongo import MongoClient
 
 class Database:
 # Database
@@ -36,6 +37,12 @@ class Database:
     return (
       'Database object \'{name}\' containing {col_count} collection(s).'.format(name=self.name, col_count=len(self.collections))
     )
+  
+  def analyze(self, database):
+
+    return list(map(
+      lambda collection: collection.analyze(database[collection.address])
+    , self.collections))
 
   def to_plain(self):
   # to_plain

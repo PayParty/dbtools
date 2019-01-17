@@ -1,4 +1,5 @@
 from .Database import Database
+from pymongo import MongoClient
 
 class Server:
 # Server
@@ -36,6 +37,14 @@ class Server:
     return (
       'Server object \'{name}\' containing {db_count} database(s).'.format(name=self.name, db_count=len(self.databases))
     )
+
+  def analyze(self):
+
+    client = MongoClient(self.connection_string)
+
+    return list(map(
+      lambda database: database.analyze(client[database.address])
+    , self.databases))
   
   def to_plain(self):
   # to_plain

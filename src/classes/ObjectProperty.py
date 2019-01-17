@@ -39,6 +39,33 @@ class ObjectProperty:
     return (
       'ObjectProperty object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
+
+  def compare(self, document_property):
+
+    if document_property:
+
+      if isinstance(document_property, dict):
+
+        object_property = document_property
+        result = {}
+
+        for prop in self.properties:
+          result[prop.name] = prop.compare(object_property.pop(prop.name, None))
+        
+        while not object_property == {}:
+          result[object_property.popitem()[0]] = 'unexpected'
+
+        return result
+
+      else:
+        return 'invalid type'
+    
+    else:
+
+      if self.optional:
+        return None
+      else:
+        return 'missing property'
   
   def to_plain(self):
   # to_plain

@@ -1,6 +1,7 @@
 from .Property import Property
 from .ObjectProperty import ObjectProperty
 from .ControlledObjectProperty import ControlledObjectProperty
+from pymongo import MongoClient
 
 def prop_from_plain(prop):
 # prop_from_plain
@@ -44,7 +45,7 @@ class Collection:
       self.properties = list(map(
         lambda prop: prop_from_plain(prop)
       , from_plain.get('properties', [])))
-      self.address = kwargs.get('address', '')
+      self.address = from_plain.get('address', '')
     else:
       self.__class = 'Collection'
       self.name = kwargs.get('name', '')
@@ -57,6 +58,26 @@ class Collection:
     return (
       'Collection object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
+
+  def analyze(self, collection):
+
+    cursor = collection.find({})
+    results = []
+
+    for i in range(0, cursor.count()):
+
+      document = cursor[i]
+      document_result = {}
+
+      for prop in self.properties:
+        document_result[prop.name] = prop.compare(document.pop(prop.name, None))
+      
+      while not document == {}:
+        document_result[document.popitem()[0]] = 'unexpected'
+      
+      results.append(document_result)
+    
+    return results
 
   def to_plain(self):
   # to_plain
@@ -72,7 +93,7 @@ class Collection:
       '__class': self.__class,
       'name': self.name,
       'properties': plain_properties,
-      'addresss': self.address
+      'address': self.address
     }
   
   @property
