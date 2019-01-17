@@ -4,7 +4,7 @@ def app(args):
 # CLI loop
 #
 
-  screen_stack = [('environment_select', None)]
+  screen_stack = [('environment_select', None, False)]
 
   while len(screen_stack) > 0:
 
