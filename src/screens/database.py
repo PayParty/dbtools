@@ -39,7 +39,7 @@ def database_new(server):
   new_database = (Database(name=name, address=address))
   server.add_databases([new_database])
   
-  return (None, None, False)
+  return ('database_view', new_database, False)
 
 def database_view(database):
 

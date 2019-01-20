@@ -2,3 +2,6 @@
 src/__pycache__/
 src/classes/__pycache__/
 src/screens/__pycache__/
+
+# test files
+test*

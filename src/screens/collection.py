@@ -39,7 +39,7 @@ def collection_new(database):
   new_collection = (Collection(name=name, address=address))
   database.add_collections([new_collection])
   
-  return (None, None, False)
+  return ('collection_view', new_collection, False)
 
 def collection_view(collection):
 

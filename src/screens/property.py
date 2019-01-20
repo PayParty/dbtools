@@ -116,7 +116,10 @@ def property_new(collection):
   
   collection.add_properties([new_property])
 
-  return (None, None, False)
+  if new_property.type == 'ObjectProperty' or new_property.type == 'ControlledObjectProperty':
+    return ('property_view', new_property, False)
+  else:
+    return (None, None, False)
 
 def property_view(prop):
   

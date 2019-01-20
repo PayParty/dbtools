@@ -39,7 +39,7 @@ def server_new(environment):
   new_server = (Server(name=name, connection_string=connection_string))
   environment.add_servers([new_server])
   
-  return (None, None, False)
+  return ('server_view', new_server, False)
 
 def server_view(server):
 

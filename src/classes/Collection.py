@@ -59,25 +59,56 @@ class Collection:
       'Collection object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
 
-  def analyze(self, collection):
+  def analyze(self, write, client):
 
-    cursor = collection.find({})
-    results = []
+    # Get cursor from client database
+    #
+    cursor = client[self.address].find({})
 
-    for i in range(0, cursor.count()):
+    # Open collection in log file
+    #
+    write('object_start')
+    write('object_key', 'collection')
+    write('object_value', self.name)
+    write('object_key', 'documents')
+    write('array_start', True)
 
-      document = cursor[i]
-      document_result = {}
+    # Compare logic
+    #
+    def compare_document(document):
 
-      for prop in self.properties:
-        document_result[prop.name] = prop.compare(document.pop(prop.name, None))
+      def write_prop(prop):
+        write('object_key', prop[0])
+        write('object_value', prop[1])
+
+      result = dict(map(
+        lambda prop: (prop.name, prop.compare(document.get(prop.name, None)))
+      , self.properties))
+
+      _ = list(map(
+        lambda prop: result.setdefault(prop[0], 'unexpected property')
+      , list(document.items())))
+
+      # Write results
+      #
+      write('object_start')
       
-      while not document == {}:
-        document_result[document.popitem()[0]] = 'unexpected'
-      
-      results.append(document_result)
-    
-    return results
+      _ = list(map(
+        lambda prop: write_prop(prop)
+      , list(result.items())))
+
+      write('object_end')
+
+    # Run through documents
+    #
+    _ = list(map(
+      lambda document: compare_document(document)
+    ,cursor))
+
+    # Close collection in log file
+    #
+    write('array_end')
+    write('object_end')
 
   def to_plain(self):
   # to_plain
