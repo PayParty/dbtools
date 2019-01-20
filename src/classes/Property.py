@@ -33,44 +33,48 @@ class Property:
       'Property object \'{name}\' of type {type}.'.format(name=self.name, type=self.type)
     )
   
-  def compare(self, document_property):
+  def analyze(self, document_property, write):
+    
+    # Open property in log file
+    #
+    write('object_key', self.name)
 
     if document_property:
 
       if self.type == 'ObjectID':
         if isinstance(document_property, ObjectId):
-          return None
+          write('object_value', None)
         else:
-          return 'invalid type'
-        
+          write('object_value', 'invalid type')
+
       elif self.type == 'String':
         if isinstance(document_property, str):
-          return None
+          write('object_value', None)
         else:
-          return 'invalid type'
-        
+          write('object_value', 'invalid type')
+      
       elif self.type == 'Number':
         if isinstance(document_property, int) or isinstance(document_property, float):
-          return None
+          write('object_value', None)
         else:
-          return 'invalid type'
-        
+          write('object_value', 'invalid type')
+      
       elif self.type == 'Boolean':
         if isinstance(document_property, bool):
-          return None
+          write('object_value', None)
         else:
-          return 'invalid type'
-
+          write('object_value', 'invalid type')
+      
       elif self.type == 'Any':
-        return None
+        write('object_value', None)
 
     else:
 
       if self.optional:
-        return None
+        write('object_value', None)
       else:
-        return 'missing property'
-
+        write('object_value', 'missing property')
+  
   def to_plain(self):
   # to_plain
   #

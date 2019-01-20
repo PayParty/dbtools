@@ -73,37 +73,38 @@ class Collection:
     write('object_key', 'documents')
     write('array_start', True)
 
-    # Compare logic
+    # Build documents
     #
-    def compare_document(document):
+    def analyze_document(document, write):
 
-      def write_prop(prop):
-        write('object_key', prop[0])
-        write('object_value', prop[1])
+      # Open document in log file
+      #
+      write('object_start')
 
-      result = dict(map(
-        lambda prop: (prop.name, prop.compare(document.get(prop.name, None)))
+      # Write unexpected properties
+      #
+      def write_unexpected(prop_name, write):
+        
+        write('object_key', prop_name)
+        write('object_value', 'unexpected property')
+
+      _ = list(map(
+        lambda prop: prop.analyze(document.get(prop.name, None), write)
       , self.properties))
 
       _ = list(map(
-        lambda prop: result.setdefault(prop[0], 'unexpected property')
+        lambda prop: write_unexpected(prop[0], write)
       , list(document.items())))
 
-      # Write results
+      # Close document in log file
       #
-      write('object_start')
-      
-      _ = list(map(
-        lambda prop: write_prop(prop)
-      , list(result.items())))
-
       write('object_end')
 
-    # Run through documents
+    # Iterate documents in collection
     #
     _ = list(map(
-      lambda document: compare_document(document)
-    ,cursor))
+      lambda document: analyze_document(document, write)
+    , cursor))
 
     # Close collection in log file
     #
