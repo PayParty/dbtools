@@ -137,8 +137,7 @@ def environment_view(environment):
       return ('environment_save', environment, True)
     elif user_input in ['R', 'r']:
       user_input_valid = True
-      environment.analyze()
-      return (None, None, True)
+      return ('environment_analyze', environment, True)
     elif user_input in ['Q', 'q']:
       user_input_valid = True
       return (None, None, False)
@@ -174,3 +173,168 @@ def environment_save(environment):
       '\nCould not save file\n\n'
     )
     return (None, None, False)
+
+def environment_analyze(environment):
+# environment_analyze
+#
+# Allows the user to select analysis targets,
+# calls the analysis, and returns the analysis
+# viewer screen call
+
+  print ()
+
+  targets = environment.targets
+
+  # Selection loop
+  #
+  user_done = False
+  while not user_done:
+
+    # Show current selection
+    #
+    print(
+      '  Analysis\n\n  Current selection:\n'
+    )
+    for server in environment.servers:
+      print(
+        '    ({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) else ' ', name=server.name)
+      )
+      for database in server.databases:
+        print(
+          '      ({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) else ' ', name=database.name)
+        )
+        for collection in database.collections:
+          print(
+            '        ({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) and collection.name in list(targets[server.name][database.name]) else ' ', name=collection.name)
+          )
+    print('\n')
+
+    # User
+    #
+    user_input_valid = False
+    while not user_input_valid:
+      user_input = input(
+        '(S path) Select element by path\n'+
+        '(D path) Deselect element by path\n'+
+        '   path: server[.database[.collection]]\n'+
+        '(R) Run analysis   | (X) Back\n'
+      )
+      if user_input in ['X', 'x']:
+        user_input_valid = True
+        user_done = True
+        environment.targets = targets
+        return (None, None, False)
+      elif user_input in ['R', 'r'] and len(targets.keys()) > 0:
+        user_input_valid = True
+        user_done = True
+        environment.targets = targets
+        log_filepath = environment.analyze()
+        return ('analysis_view', log_filepath, False)
+
+      # Select
+      #
+      elif user_input.split(' ', 1)[0] in ['S', 's']:
+
+        print('\n')
+
+        try:
+          path = user_input.split(' ', 1)[1].split('.')
+
+          # Server
+          #
+          if len(path) > 0 and path[0]:
+            found_server = list(filter(
+              lambda server: server.name == path[0]
+            , environment.servers)).pop()
+            if targets.get(found_server.name, None) == None:
+              targets[found_server.name] = {}
+            if len(path) == 1:
+              targets[found_server.name] = dict(map(
+                lambda database: (database.name, list(map(lambda collection: collection.name, database.collections)))
+              , found_server.databases))
+            
+            # Database
+            #
+            if len(path) > 1 and path[1]:
+              found_database = list(filter(
+                lambda database: database.name == path[1]
+              , found_server.databases)).pop()
+              if targets[found_server.name].get(found_database.name, None) == None:
+                targets[found_server.name][found_database.name] = []
+              if len(path) == 2:
+                targets[found_server.name][found_database.name] = list(map(
+                  lambda collection: collection.name
+                , found_database.collections))
+
+              # Collection
+              #
+              if len(path) > 2 and path[2]:
+                found_collection = list(filter(
+                  lambda collection: collection.name == path[2]
+                , found_database.collections)).pop()
+                if not path[2] in targets[found_server.name][found_database.name]:
+                  targets[found_server.name][found_database.name].append(found_collection.name)
+                  raise GeneratorExit('collection')
+              
+              else:
+                raise GeneratorExit('database')
+            else:
+              raise GeneratorExit('server')
+          else:
+            raise GeneratorExit('none')
+
+        except GeneratorExit as exit_value:
+
+          if str(exit_value) == 'none':
+            print('\nNothing selected\n\n')
+          elif str(exit_value) == 'server':
+            print('\nServer selected\n\n')
+          elif str(exit_value) == 'database':
+            print('\nDatabase selected\n\n')
+          elif str(exit_value) == 'collection':
+            print('\nCollection selected\n\n')
+          
+          user_input_valid = True
+          continue
+
+        except Exception as error:
+          print('\nSyntax error. Selection may have occurred incorrectly\n\n')
+          user_input_valid = True
+          continue
+
+      # Deselect
+      #
+      elif user_input.split(' ', 1)[0] in ['D', 'd']:
+
+        print('\n')
+        
+        try:
+          path = user_input.split(' ', 1)[1].split('.')
+
+          if len(path) == 3:
+            user_input_valid = True
+            targets[path[0]][path[1]].remove(path[2])
+            if targets[path[0]][path[1]] == []:
+              del targets[path[0]][path[1]]
+              if targets[path[0]] == {}:
+                del targets[path[0]]
+            continue
+          elif len(path) == 2:
+            user_input_valid = True
+            del targets[path[0]][path[1]]
+            if targets[path[0]] == {}:
+              del targets[path[0]]
+            continue
+          elif len(path) == 1:
+            user_input_valid = True
+            del targets[path[0]]
+            continue
+          else:
+            raise Exception()
+        
+        except Exception as error:
+          print('\nSyntax error\n\n')
+          user_input_valid = True
+          continue
+
+      print('\nInvalid input\n\n')

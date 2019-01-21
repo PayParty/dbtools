@@ -1,5 +1,5 @@
 from .Server import Server
-from json import dumps
+from json import dumps, loads
 from pprint import pprint
 from datetime import datetime
 
@@ -28,12 +28,14 @@ class Environment:
         lambda server: Server(from_plain=server)
       , from_plain.get('servers', [])))
       self.filepath = from_plain.get('filepath', '')
+      self.targets = loads(from_plain.get('targets', {}))
     else:
       self.__class = 'Environment'
       self.name = kwargs.get('name', '')
       self.__servers = []
       self.servers = kwargs.get('servers', [])
       self.filepath = kwargs.get('filepath', '')
+      self.targets = kwargs.get('targets', {})
 
   def __repr__(self):
 
@@ -161,21 +163,21 @@ class Environment:
     write_to_logs(logfile_path, 'object_key', 'servers')   
     write_to_logs(logfile_path, 'array_start', True)
 
-    targets = { 'Dev': { 'payparty-dev': [ 'printers' ] } }
-
     # Call analyze in servers
     #
     target_servers = list(filter(
-      lambda server: server.name in targets.keys()
+      lambda server: server.name in self.targets.keys()
     , self.servers))
     _ = list(map(
-      lambda server: server.analyze(targets=targets[server.name], write=lambda action, data=None: write_to_logs(logfile_path, action, data))
+      lambda server: server.analyze(targets=self.targets[server.name], write=lambda action, data=None: write_to_logs(logfile_path, action, data))
     , target_servers))
     
     # Close environment in log file
     #
     write_to_logs(logfile_path, 'array_end')
     write_to_logs(logfile_path, 'object_end')
+
+    return logfile_path
   
   def to_plain(self):
   # to_plain
@@ -191,7 +193,8 @@ class Environment:
       '__class': self.__class,
       'name': self.name,
       'servers': plain_servers,
-      'filepath': self.filepath
+      'filepath': self.filepath,
+      'targets': dumps(self.targets)
     }
   
   @property
@@ -227,3 +230,11 @@ class Environment:
   def filepath(self, new_filepath):
     if isinstance(new_filepath, str):
       self.__filepath = new_filepath
+  
+  @property
+  def targets(self):
+    return self.__targets
+  @targets.setter
+  def targets(self, new_targets):
+    if isinstance(new_targets, dict):
+      self.__targets = new_targets
