@@ -78,7 +78,7 @@ class ObjectProperty:
       else:
         write('object_value', 'missing property')
 
- def to_plain(self):
+  def to_plain(self):
   # to_plain
   #
   # Returns a plain python object representing the ObjectProperty object
