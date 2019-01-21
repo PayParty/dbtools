@@ -89,7 +89,7 @@ class Collection:
         write('object_value', 'unexpected property')
 
       _ = list(map(
-        lambda prop: prop.analyze(document.get(prop.name, None), write)
+        lambda prop: prop.analyze(document.pop(prop.name, None), write)
       , self.properties))
 
       _ = list(map(

@@ -48,34 +48,47 @@ class ControlledObjectProperty:
       'ControlledObjectProperty object \'{name}\' containing {cont}+{prop_count} properties.'.format(name=self.name, cont=controller_count, prop_count=len(self.properties))
     )
 
-  def compare(self, document_property):
+  def analyze(self, document_property, write):
+
+    # Create key in log file
+    #
+    write('object_key', self.name)
 
     if document_property:
-      
-      if isinstance(document_property, dict):
-        
-        object_property = document_property
-        result = {}
 
-        result[self.controller.name] = self.controller.compare(object_property.pop(self.controller.name, None))
+      # Open object in log file
+      #
+      write('object_start', True)
 
-        for prop in self.properties:
-          result[prop.name] = prop.compare(object_property.pop(prop.name, None))
-        
-        while not object_property == {}:
-          result[object_property.popitem()[0]] = 'unexpected'
+      # Controller
+      #
+      self.controller.analyze(document_property.pop(self.controller.name, write))
 
-        return result
+      # Write unexpected properties
+      #
+      def write_unexpected(prop_name, write):
 
-      else:
-        return 'invalid type'
-    
+        write('object_key', prop_name)
+        write('object_value', 'unexpected property')
+
+      _ = list(map(
+        lambda prop: prop.analyze(document_property.pop(prop.name, None), write)
+      , self.properties))
+
+      _ = list(map(
+        lambda prop: write_unexpected(prop[0], write)
+      , list(document_property.items())))
+
+      # Close property in log file
+      #
+      write('object_end')
+
     else:
 
       if self.optional:
-        return None
+        write('object_value', None)
       else:
-        return 'missing property'
+        write('object_value', 'missing property')
 
   def to_plain(self):
   # to_plain

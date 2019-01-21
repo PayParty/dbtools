@@ -39,35 +39,46 @@ class ObjectProperty:
     return (
       'ObjectProperty object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
+  
+  def analyze(self, document_property, write):
 
-  def compare(self, document_property):
+    # Create key in log file
+    #
+    write('object_key', self.name)
 
     if document_property:
 
-      if isinstance(document_property, dict):
+      # Open object in log file
+      #
+      write('object_start', True)
 
-        object_property = document_property
-        result = {}
+      # Write unexpected properties
+      #
+      def write_unexpected(prop_name, write):
 
-        for prop in self.properties:
-          result[prop.name] = prop.compare(object_property.pop(prop.name, None))
-        
-        while not object_property == {}:
-          result[object_property.popitem()[0]] = 'unexpected'
+        write('object_key', prop_name)
+        write('object_value', 'unexpected property')
 
-        return result
+      _ = list(map(
+        lambda prop: prop.analyze(document_property.pop(prop.name, None), write)
+      , self.properties))
 
-      else:
-        return 'invalid type'
-    
+      _ = list(map(
+        lambda prop: write_unexpected(prop[0], write)
+      , list(document_property.items())))
+
+      # Close property in log file
+      #
+      write('object_end')
+
     else:
 
       if self.optional:
-        return None
+        write('object_value', None)
       else:
-        return 'missing property'
-  
-  def to_plain(self):
+        write('object_value', 'missing property')
+
+ def to_plain(self):
   # to_plain
   #
   # Returns a plain python object representing the ObjectProperty object
