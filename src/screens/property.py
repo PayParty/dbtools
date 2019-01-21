@@ -27,7 +27,7 @@ def property_new(collection):
     type_input = input(
       'Select a property type:\n'+
       '(I) Object ID   | (S) String   | (N) Number   | (B) Boolean\n'+
-      '(A) Any         | (O) Object   | (C) Controlled Object\n'
+      '(A) Array       | (O) Object   | (C) Controlled Object        | (X) Any\n'
     )
     if type_input in ['O', 'o']:
       user_input_valid = True
@@ -54,6 +54,10 @@ def property_new(collection):
       prop_type = 'ObjectID'
       del type_input
     elif type_input in ['A', 'a']:
+      user_input_valid = True
+      prop_type = 'ArrayProperty'
+      del type_input
+    elif type_input in ['X', 'x']:
       user_input_valid = True
       prop_type = 'Any'
       del type_input
@@ -109,6 +113,46 @@ def property_new(collection):
     
     new_property = ControlledObjectProperty(name=name, controller=Property(name=controller, type='Boolean'), optional=optional)
   
+  # ArrayProperty
+  #
+  elif prop_type == 'ArrayProperty':
+
+    # Element type
+    #
+    user_input_valid = False
+    while not user_input_valid:
+      property_type_input = input(
+        'Select an element type:\n'+
+        '(I) ObjectID   | (S) String   | (N) Number\n'+
+        '(B) Boolean    | (X) Any\n'
+      )
+      if property_type_input in ['I', 'i']:
+        user_input_valid = True
+        property_type = 'ObjectID'
+        del property_type_input
+      elif property_type_input in ['S', 's']:
+        user_input_valid = True
+        property_type = 'String'
+        del property_type_input
+      elif property_type_input in ['N', 'n']:
+        user_input_valid = True
+        property_type = 'Number'
+        del property_type_input
+      elif property_type_input in ['B', 'b']:
+        user_input_valid = True
+        property_type = 'Boolean'
+        del property_type_input
+      elif property_type_input in ['X', 'x']:
+        user_input_valid = True
+        property_type = 'Any'
+        del property_type_input
+      else:
+        print(
+          '\nInvalid type selected\n\n'
+        )
+
+    new_property = ArrayProperty(name=name, property_type=property_type, optional=optional)
+  
   # Other types
   #
   else:
@@ -129,6 +173,8 @@ def property_view(prop):
     return property_view_object_property(prop)
   elif prop.type == 'ControlledObjectProperty':
     return property_view_controlled_object_property(prop)
+  elif prop.type == 'ArrayProperty':
+    return property_view_array_property(prop)
   else:
     return property_view_property(prop)
 
@@ -272,5 +318,32 @@ def property_view_controlled_object_property(prop):
           return ('property_view', prop.properties[int(user_input[1:])], True)
         except:
           pass
+
+    print('\nInvalid input\n\n')
+
+def property_view_array_property(prop):
+  
+  print()
+
+  # Show property data
+  #
+  if prop.optional:
+    optional = 'Yes'
+  else:
+    optional = 'No'
+  print(
+    '\n  Property {name}\n  Type: {type}\n  Element type: {property_type}\n  Optional: {optional}\n'.format(name=prop.name, type=prop.type, property_type=prop.property_type, optional=optional)
+  )
+
+  # User
+  #
+  user_input_valid = False
+  while not user_input_valid:
+    user_input = input(
+      '(X) Back\n'
+    )
+    if user_input in ['X', 'x']:
+      user_input_valid = True
+      return (None, None, False)
 
     print('\nInvalid input\n\n')

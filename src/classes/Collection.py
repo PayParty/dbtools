@@ -1,6 +1,7 @@
 from .Property import Property
 from .ObjectProperty import ObjectProperty
 from .ControlledObjectProperty import ControlledObjectProperty
+from .ArrayProperty import ArrayProperty
 from pymongo import MongoClient
 
 def prop_from_plain(prop):
@@ -18,6 +19,8 @@ def prop_from_plain(prop):
     return ObjectProperty(from_plain=prop)
   elif prop_class == 'ControlledObjectProperty':
     return ControlledObjectProperty(from_plain=prop)
+  elif prop_class == 'ArrayProperty':
+    return ArrayProperty(from_plain=prop)
   else:
     pass
 
