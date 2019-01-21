@@ -57,12 +57,23 @@ def collection_view(collection):
     '  Properties:\n'
   )
   for i in range(0, len(collection.properties)):
+
     if collection.properties[i].optional:
       optional = '*'
     else:
       optional = ''
+
+    if collection.properties[i].type == 'ObjectProperty':
+      type_string = 'Object'
+    elif collection.properties[i].type == 'ControlledObjectProperty':
+      type_string = 'Controlled Object'
+    elif collection.properties[i].type == 'ArrayProperty':
+      type_string = '<{elt_type}>'.format(elt_type=collection.properties[i].property_type)
+    else:
+      type_string = collection.properties[i].type
+
     print(
-      '    ({i}) {name} ({type}){optional}'.format(i=str(i).center(5, ' '), name=collection.properties[i].name, type=collection.properties[i].type, optional=optional)
+      '    ({i}) {name} ({type}){optional}'.format(i=str(i).center(5, ' '), name=collection.properties[i].name, type=type_string, optional=optional)
     )
   if len(collection.properties) == 0:
     print(

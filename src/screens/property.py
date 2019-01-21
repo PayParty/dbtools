@@ -1,4 +1,4 @@
-from .. import Property, ObjectProperty, ControlledObjectProperty
+from .. import Property, ObjectProperty, ControlledObjectProperty, ArrayProperty
 
 def property_new(collection):
 

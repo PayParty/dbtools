@@ -5,3 +5,4 @@ from .Collection import Collection
 from .ControlledObjectProperty import ControlledObjectProperty
 from .ObjectProperty import ObjectProperty
 from .Property import Property
+from .ArrayProperty import ArrayProperty
