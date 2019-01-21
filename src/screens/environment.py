@@ -4,7 +4,7 @@ from json import loads, dumps
 def environment_select(a=None):
   
   print (
-    '\n\n\n  dbtool for MongoDB\n\n\n'
+    '\n\n\n  dbtools for MongoDB\n\n\n'
   )
   user_input_valid = False
   while not user_input_valid:
