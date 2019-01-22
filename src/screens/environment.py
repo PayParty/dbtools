@@ -139,8 +139,8 @@ def environment_view(environment):
   user_input_valid = False
   while not user_input_valid:
     user_input = input(
-      '(N) New server   | (O#) Open server by index   | (R) Run analysis\n'+
-      '(S) Save environment                           | (Q) Close environment without saving\n'
+      '(N) New server         | (O#) Open server by index   | (R) Run analysis\n'+
+      '(S) Save environment   | (Q) Close environment without saving\n'
     )
     if user_input in ['N', 'n']:
       user_input_valid = True
@@ -212,14 +212,18 @@ def environment_analyze(environment):
       print(
         '    ({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) else ' ', name=server.name)
       )
+      if len(server.databases) > 0:
+        print('    | ')
       for database in server.databases:
         print(
-          '      ({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) else ' ', name=database.name)
+          '    |-({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) else ' ', name=database.name)
         )
         for collection in database.collections:
           print(
-            '        ({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) and collection.name in list(targets[server.name][database.name]) else ' ', name=collection.name)
+            '    | |-({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) and collection.name in list(targets[server.name][database.name]) else ' ', name=collection.name)
           )
+        if len(database.collections) > 0:
+          print('    | ')
     print('\n')
 
     # User
@@ -227,10 +231,9 @@ def environment_analyze(environment):
     user_input_valid = False
     while not user_input_valid:
       user_input = input(
-        '(S path) Select element by path\n'+
-        '(D path) Deselect element by path\n'+
-        '   path: server[.database[.collection]]\n'+
-        '(R) Run analysis   | (X) Back\n'
+        '(S path) Select element by path   | (D path) Deselect element by path\n'+
+        '(R) Run analysis   | (X) Back     | (path: server[.database[.collection]])\n'+
+        '\n'
       )
       if user_input in ['X', 'x']:
         user_input_valid = True
