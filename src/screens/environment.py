@@ -1,7 +1,11 @@
 from .. import Environment
 from json import loads, dumps
 
-def environment_select(a=None):
+def environment_select(args=None):
+
+  if args:
+    environment = environment_open(args)
+    return ('environment_view', environment, False)
   
   print (
     '\n\n\n  dbtools for MongoDB\n\n\n'
@@ -68,9 +72,18 @@ def environment_create(a=None):
 
   return Environment(name=name, filepath=filepath)
 
-def environment_open(a=None):
+def environment_open(args=None):
 
   print()
+
+  if args:
+    try:
+      file_input = open(args, 'r')
+      file_contents = file_input.read()
+      file_input.close()
+      return Environment(from_plain=loads(file_contents))
+    except:
+      raise Exception()
 
   # Get filepath
   #

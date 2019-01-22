@@ -4,7 +4,13 @@ def app(args):
 # CLI loop
 #
   try:
-    screen_stack = [('environment_select', None, False)]
+
+    # Capture path from args
+    #
+    if args:
+      screen_stack = [('environment_select', args[1], False)]
+    else:
+      screen_stack = [('environment_select', None, False)]
 
     while len(screen_stack) > 0:
 
