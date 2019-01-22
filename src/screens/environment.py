@@ -231,7 +231,7 @@ def environment_analyze(environment):
     while not user_input_valid:
       user_input = input(
         '(S path) Select element by path   | (D path) Deselect element by path\n'+
-        '(R) Run analysis   | (X) Back     | (path: server[.database[.collection]])\n'+
+        '(R) Run analysis     | (X) Back   | (path: server[.database[.collection]])\n'+
         '\n'
       )
       if user_input in ['X', 'x']:
