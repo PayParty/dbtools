@@ -222,8 +222,7 @@ def environment_analyze(environment):
           print(
             '    | |-({selected}) {name}'.format(selected='S' if server.name in list(targets.keys()) and database.name in list(targets[server.name].keys()) and collection.name in list(targets[server.name][database.name]) else ' ', name=collection.name)
           )
-        if len(database.collections) > 0:
-          print('    | ')
+        print('    | ')
     print('\n')
 
     # User
