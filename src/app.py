@@ -5,12 +5,9 @@ def app(args):
 #
   try:
 
-    # Capture path from args
-    #
-    if args:
-      screen_stack = [('environment_select', args[1], False)]
-    else:
-      screen_stack = [('environment_select', None, False)]
+    screen_stack = [('environment_select', None, False)]
+    if len(args) > 1:
+      screen_stack.append(('environment_select', args[1], False))
 
     while len(screen_stack) > 0:
 
