@@ -1,5 +1,5 @@
 from os import listdir
-from os.path import isfile
+from os.path import isfile, isdir
 from json import loads
 
 def analysis_success(log_return):
@@ -33,7 +33,7 @@ def analysis_view(logs_path):
 
     for i in range(0,len(logs)):
       print(
-        '({i}) {log_name}'.format(i=str(i).center(5, ' '), log_name=logs[i])
+        '    ({i}) {log_name}'.format(i=str(i).center(5, ' '), log_name=logs[i])
       )
     print('\n')
     
@@ -52,7 +52,7 @@ def analysis_view(logs_path):
       elif len(user_input) > 1:
         if user_input[0] in ['O', 'o'] and user_input[1:].isdigit():
           try:
-            return ('analysis_view_environment', '{logs}/{log}'.format(logs=logs_path, log=logs[int(user_input[1:])]), False)
+            return ('analysis_view_environment', '{logs}/{log}'.format(logs=logs_path, log=logs[int(user_input[1:])]), True)
           except:
             pass
       
@@ -65,9 +65,57 @@ def analysis_view_environment(logs_path):
   
   print()
 
-  print(logs_path)
+  dir_contents = listdir(logs_path)
+  dir_environment = list(filter(
+    lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
+  , dir_contents))
+  dir_servers = list(filter(
+    lambda path: isdir('{logs}/{r_path}'.format(logs=logs_path, r_path=path))
+  , dir_contents))
+  del dir_contents
 
-  return (None, None, False)
+  try:
+
+    path_environment = '{logs}/{r_path}'.format(logs=logs_path, r_path=dir_environment[0]) 
+    del dir_environment
+
+    with open(path_environment, 'r') as file_environment:
+      data_environment = loads(file_environment.read())
+
+    print(
+      '  Environment {name}:\n'.format(name=data_environment['environment']) +
+      '    {count} issues\n\n'.format(count=data_environment['issues']['properties']) +
+      '  Servers:'
+    )
+
+    for i in range(0, len(dir_servers)):
+      print(
+        '    ({i}) {server}'.format(i=str(i).center(5, ' '), server=dir_servers[i])
+      )
+    print('\n')
+
+    user_input_valid = False
+    while not user_input_valid:
+      user_input = input(
+        '(O#) Open server by index   | (X) Back\n'
+      )
+
+      if user_input in ['X', 'x']:
+        user_input_valid = True
+        return (None, None, False)
+      elif len(user_input) > 1:
+        if user_input[0] in ['O', 'o'] and user_input[1:].isdigit():
+          try:
+            return ('analysis_view_server', '{logs}/{log}'.format(logs=logs_path, log=dir_servers[int(user_input[1:])]), True)
+          except:
+            pass
+      
+      print('\nInvalid input\n\n')
+
+    return (None, None, False)
+
+  except:
+    return (None, None, False)
 
 def analysis_view_server(logs_path):
   pass
