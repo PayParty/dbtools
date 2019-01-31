@@ -66,7 +66,7 @@ class Environment:
       lambda server: server.name in self.targets.keys()
     , self.servers))
     server_returns = list(map(
-      lambda server: server.analyze(targets=self.targets[server.name], log_path))
+      lambda server: server.analyze(self.targets[server.name], log_path))
     , target_servers)
 
     # Count issues
