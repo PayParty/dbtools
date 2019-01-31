@@ -3,6 +3,7 @@ from .ObjectProperty import ObjectProperty
 from .ControlledObjectProperty import ControlledObjectProperty
 from .ArrayProperty import ArrayProperty
 from pymongo import MongoClient
+from os import mkdir
 
 def prop_from_plain(prop):
 # prop_from_plain
@@ -62,16 +63,26 @@ class Collection:
       'Collection object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
 
-  def analyze(self, client):
+  def analyze(self, client, log_path):
+
+    # Initialize logs
+    #
+    log_path = log_path + '/{collection}'.format(collection=self.address)
+    mkdir(log_path)
 
     # Get cursor from client database
     #
     cursor = client[self.address].find({})
 
+    # Document analysis
+    #
+    def analyze_document(document, log_path):
+      pass
+
     # Iterate documents in collection
     #
-    _ = list(map(
-      lambda document: _(document)
+    document_returns = list(map(
+      lambda document: analyze_document(document, log_path)
     , cursor))
 
   def to_plain(self):

@@ -2,6 +2,7 @@ from .Server import Server
 from json import dumps, loads
 from pprint import pprint
 from datetime import datetime
+from os import mkdir
 
 class Environment:
 # Environment
@@ -54,12 +55,10 @@ class Environment:
   # accessing the servers to the relevant objects.
   #
 
-    # Initialize log file
+    # Initialize logs
     #
-    logfile_path = self.filepath + str(datetime.now()) + '.log'
-    logfile = open(logfile_path, 'w')
-    logfile.write('')
-    logfile.close()
+    log_path = self.filepath + str(datetime.now())
+    mkdir(log_path)
 
     # Call analyze in servers
     #
@@ -67,7 +66,7 @@ class Environment:
       lambda server: server.name in self.targets.keys()
     , self.servers))
     _ = list(map(
-      lambda server: server.analyze(targets=self.targets[server.name], target_servers))
+      lambda server: server.analyze(targets=self.targets[server.name], log_path))
     , target_servers)
     
     return ''

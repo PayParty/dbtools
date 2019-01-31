@@ -1,5 +1,6 @@
 from .Database import Database
 from pymongo import MongoClient
+from os import mkdir
 
 class Server:
 # Server
@@ -38,7 +39,12 @@ class Server:
       'Server object \'{name}\' containing {db_count} database(s).'.format(name=self.name, db_count=len(self.databases))
     )
 
-  def analyze(self, targets):
+  def analyze(self, targets, log_path):
+
+    # Initialize logs
+    #
+    log_path = log_path + '/{server}'.format(server=self.name)
+    mkdir(log_path)
 
     # Create connection to server
     #
@@ -50,7 +56,7 @@ class Server:
       lambda database: database.name in targets.keys()
     , self.databases))
     _ = list(map(
-      lambda database: database.analyze(targets=targets[database.name], client=client)
+      lambda database: database.analyze(targets[database.name], client, log_path)
     , target_databases))
 
   def to_plain(self):

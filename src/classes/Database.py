@@ -1,5 +1,6 @@
 from .Collection import Collection
 from pymongo import MongoClient
+from os import mkdir
 
 class Database:
 # Database
@@ -38,7 +39,12 @@ class Database:
       'Database object \'{name}\' containing {col_count} collection(s).'.format(name=self.name, col_count=len(self.collections))
     )
   
-  def analyze(self, targets, client):
+  def analyze(self, targets, client, log_path):
+
+    # Initialize logs
+    #
+    log_path = log_path + '/{database}'.format(database=self.address)
+    mkdir(log_path)
 
     # Get database from client
     #
@@ -49,7 +55,7 @@ class Database:
       lambda collection: collection.name in targets
     , self.collections))
     _ = list(map(
-      lambda collection: collection.analyze(write=write, client=client_database)
+      lambda collection: collection.analyze(client_database, log_path)
     , target_collections))
 
   def to_plain(self):
