@@ -34,8 +34,28 @@ class Property:
     )
   
   def analyze(self, document_property):
+
+    types = {
+      'String': [str],
+      'Number': [int, float],
+      'Boolean': [bool],
+      'ObjectID': [ObjectId],
+      'Any': [str, int, float, bool, ObjectId, dict, list]
+    }
     
-    pass
+    if document_property == None:
+
+      if self.optional:
+        return None
+      else:
+        return 'missing property'
+
+    else:
+
+      if type(document_property) in types[self.type]:
+        return None
+      else:
+        return 'incorrect property type'
  
   def to_plain(self):
   # to_plain

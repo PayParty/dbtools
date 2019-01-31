@@ -243,8 +243,8 @@ def environment_analyze(environment):
         user_input_valid = True
         user_done = True
         environment.targets = targets
-        log_filepath = environment.analyze()
-        return ('analysis_success', log_filepath, False)
+        log_return = environment.analyze()
+        return ('analysis_success', log_return, False)
 
       # Select
       #

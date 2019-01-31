@@ -50,7 +50,41 @@ class ControlledObjectProperty:
 
   def analyze(self, document_property):
 
-    pass
+    if document_property == None:
+      
+      if self.optional:
+        return None
+      else:
+        return 'missing property'
+
+    else:
+
+      if not document_property.controller:
+        return 'missing controller'
+      else:
+        if not isinstance(document_property.controller, bool):
+          return 'incorrect controller type'
+
+        else:
+
+          property_results = {}
+
+          def add_result(output, name, value):
+            if value:
+              output[name] = value
+          
+          _ = list(map(
+            lambda prop: add_result(property_results, prop.name, prop.analyze(document_property.pop(prop.name, None)))
+          , self.properties))
+
+          _ = list(map(
+            lambda prop: add_result(property_results, prop[0], 'unexpected property')
+          , document_property))
+
+          if any(list(property_results.values())):
+            return 'issues in {count} propertties'.format(count=sum(list(map( lambda prop: 0 if prop == None else 1, property_results ))))
+          else:
+            return None
 
   def to_plain(self):
   # to_plain

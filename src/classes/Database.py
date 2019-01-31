@@ -1,6 +1,7 @@
 from .Collection import Collection
 from pymongo import MongoClient
 from os import mkdir
+from json import dumps
 
 class Database:
 # Database
@@ -54,9 +55,53 @@ class Database:
     target_collections = list(filter(
       lambda collection: collection.name in targets
     , self.collections))
-    _ = list(map(
+    collection_returns = list(map(
       lambda collection: collection.analyze(client_database, log_path)
     , target_collections))
+
+    # Count issues
+    #
+    issues_collections = 0
+    try:
+      issues_collections += len(list(collection_returns.items()))
+    except:
+      pass
+    issues_documents = 0
+    try:
+      issues_documents += sum(list(map( lambda collection: collection['documents'], collection_returns )))
+    except:
+      pass
+    issues_properties = 0
+    try:
+      issues_properties += sum(list(map( lambda collection: collection['properties'], collection_returns )))
+    except:
+      pass
+
+    # Create database summary
+    #
+    with open(log_path+'/_{database}.log'.format(database=self.address), 'w') as log_file:
+      log_file.write(dumps({
+        'database': self.name,
+        'address': self.address,
+        'collections': list(map(
+          lambda collection: {
+            'collection': collection.name,
+            'address': collection.address
+          }
+        , self.collections)),
+        'analysisTargets': targets.keys(),
+        'issues': {
+          'collections': issues_collections,
+          'documents': issues_documents,
+          'properties': issues_properties
+        }
+      }))
+
+    return {
+      'collections': issues_collections,
+      'documents': issues_documents,
+      'properties': issues_properties
+    }
 
   def to_plain(self):
   # to_plain

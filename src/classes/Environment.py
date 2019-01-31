@@ -65,11 +65,66 @@ class Environment:
     target_servers = list(filter(
       lambda server: server.name in self.targets.keys()
     , self.servers))
-    _ = list(map(
+    server_returns = list(map(
       lambda server: server.analyze(targets=self.targets[server.name], log_path))
     , target_servers)
-    
-    return ''
+
+    # Count issues
+    #
+    issues_servers = 0
+    try:
+      issues_servers += len(list(server_returns.items()))
+    except:
+      pass
+    issues_databases = 0
+    try:
+      issues_databases += sum(list(map( lambda server: server['collections'], server_returns )))
+    except:
+      pass
+    issues_collections = 0
+    try:
+      issues_collections += sum(list(map( lambda server: server['databases'], server_returns )))
+    except:
+      pass
+    issues_documents = 0
+    try:
+      issues_documents += sum(list(map( lambda server: server['documents'], server_returns )))
+    except:
+      pass
+    issues_properties = 0
+    try:
+      issues_properties += sum(list(map( lambda server: server['properties'], server_returns )))
+    except:
+      pass
+
+    # Create environment summary
+    #
+    with open(log_path+'/_{environment}.log'.format(environment=self.name), 'w') as log_file:
+      log_file.write(dumps({
+        'environment': self.name,
+        'servers': list(map(
+          lambda server: server.name
+        , self.servers)),
+        'analysisTargets': self.targets.keys(),
+        'issues': {
+          'servers': issues_servers,
+          'databases': issues_databases,
+          'collections': issues_collections,
+          'documents': issues_documents,
+          'properties': issues_properties
+        }
+      }))
+
+    return {
+      'path': log_path,
+      'issues': {
+        'servers': issues_servers,
+        'databases': issues_databases,
+        'collections': issues_collections,
+        'documents': issues_documents,
+        'properties': issues_properties
+      }
+    }
   
   def to_plain(self):
   # to_plain

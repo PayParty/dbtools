@@ -40,7 +40,39 @@ class ArrayProperty:
 
   def analyze(self, document_property):
 
-    pass
+    types = {
+      'String': [str],
+      'Number': [int, float],
+      'Boolean': [bool],
+      'ObjectID': [ObjectId],
+      'Any': [str, int, float, bool, ObjectId, dict, list]
+    }
+
+    if document_property == None:
+
+      if self.optional:
+        return None
+      else:
+        return 'missing property'
+
+    else:
+
+      if not isinstance(document_property, list):
+        return 'incorrect property type'
+      else:
+
+        occurences = 0
+        def add_counter(counter):
+          counter += 1
+        
+        _ = list(map(
+          lambda element: None if element in types[self.property_type] else add_counter(occurences)
+        , document_property))
+      
+        if occurences > 0:
+          return 'incorrect property type in array ({occ} occurences)'.format(occ=occurences)
+        else:
+          return None
     
   def to_plain(self):
   # to_plain

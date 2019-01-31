@@ -1,6 +1,7 @@
 from .Database import Database
 from pymongo import MongoClient
 from os import mkdir
+from json import dumps
 
 class Server:
 # Server
@@ -50,14 +51,64 @@ class Server:
     #
     client = MongoClient(self.connection_string)
 
-   # Call analyze in databases
+    # Call analyze in databases
     #
     target_databases = list(filter(
       lambda database: database.name in targets.keys()
     , self.databases))
-    _ = list(map(
+    database_returns = list(map(
       lambda database: database.analyze(targets[database.name], client, log_path)
     , target_databases))
+
+    # Count issues
+    #
+    issues_databases = 0
+    try:
+      issues_databases += len(list(database_returns.items()))
+    except:
+      pass
+    issues_collections = 0
+    try:
+      issues_collections += sum(list(map( lambda database: database['collections'], database_returns )))
+    except:
+      pass
+    issues_documents = 0
+    try:
+      issues_documents += sum(list(map( lambda database: database['documents'], database_returns )))
+    except:
+      pass
+    issues_properties = 0
+    try:
+      issues_properties += sum(list(map( lambda database: database['properties'], database_returns )))
+    except:
+      pass
+
+    # Create server summary
+    #
+    with open(log_path+'/_{server}.log'.format(server=self.name), 'w') as log_file:
+      log_file.write(dumps({
+        'server': self.name,
+        'databases': list(map(
+          lambda database: {
+            'database': database.name,
+            'address': database.address
+          }
+        , self.databases)),
+        'analysisTargets': targets.keys(),
+        'issues': {
+          'databases': issues_databases,
+          'collections': issues_collections,
+          'documents': issues_documents,
+          'properties': issues_properties
+        }
+      }))
+    
+    return {
+      'databases': issues_databases,
+      'collections': issues_collections,
+      'documents': issues_documents,
+      'properties': issues_properties
+    }
 
   def to_plain(self):
   # to_plain

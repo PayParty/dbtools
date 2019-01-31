@@ -4,6 +4,7 @@ from .ControlledObjectProperty import ControlledObjectProperty
 from .ArrayProperty import ArrayProperty
 from pymongo import MongoClient
 from os import mkdir
+from json import dumps
 
 def prop_from_plain(prop):
 # prop_from_plain
@@ -77,13 +78,70 @@ class Collection:
     # Document analysis
     #
     def analyze_document(document, log_path):
-      pass
+
+      document_results = {}
+      document_id = document.get('_id', 'no_id')
+
+      def add_result(output, name, value):
+        if value:
+          output[name] = value
+
+      _ = list(map(
+        lambda prop: add_result(document_results, prop.name, prop.analyze(document.pop(prop.name, None)))
+      , self.prop))
+
+      _ = list(map(
+        lambda prop: add_result(document_results, prop[0], 'unexpected property')
+      , list(document.items())))
+
+      if any(list(document_results.values())):
+        with open(log_path+'/'+document_id+'.log', 'w') as log_file:
+          log_file.write(dumps(document_results))
+        
+      issues = 0
+      try:
+        issues += len(list(document_results.items()))
+      except:
+        pass
+      return {
+        'properties': issues
+      } 
 
     # Iterate documents in collection
     #
     document_returns = list(map(
       lambda document: analyze_document(document, log_path)
     , cursor))
+
+    # Count issues
+    #
+    issues_documents = 0
+    try:
+      issues_documents += len(list(document_returns.items()))
+    except:
+      pass
+    issues_properties = 0
+    try:
+      issues_properties += sum(list(map( lambda document: document['properties'], document_returns )))
+    except:
+      pass
+
+    # Create collection summary
+    #
+    with open(log_path+'/_{collection}.log'.format(collection=self.address), 'w') as log_file:
+      log_file.write(dumps({
+        'collection': self.name,
+        'address': self.address,
+        'issues': {
+          'documents': issues_documents,
+          'properties': issues_properties
+        }
+      })) 
+
+    return {
+      'documents': issues_documents,
+      'properties': issues_properties
+    }
 
   def to_plain(self):
   # to_plain
