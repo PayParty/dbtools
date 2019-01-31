@@ -68,8 +68,9 @@ class Environment:
     , self.servers))
     _ = list(map(
       lambda server: server.analyze(targets=self.targets[server.name], target_servers))
+    , target_servers)
     
-    return logfile_path
+    return ''
   
   def to_plain(self):
   # to_plain
