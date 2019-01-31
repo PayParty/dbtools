@@ -68,8 +68,9 @@ class Collection:
 
     # Initialize logs
     #
-    log_path = log_path + '/{collection}'.format(collection=self.address)
+    log_path = log_path + '/{collection}'.format(collection=self.name)
     mkdir(log_path)
+    mkdir(log_path + '/Documents')
 
     # Get cursor from client database
     #
@@ -95,7 +96,7 @@ class Collection:
       , list(document.items())))
 
       if any(list(document_results.values())):
-        with open(log_path+'/'+str(document_id)+'.log', 'w') as log_file:
+        with open(log_path + '/documents/{id}.log'.format(id=str(document_id)), 'w') as log_file:
           log_file.write(dumps(document_results))
         
       issues = 0
@@ -128,7 +129,7 @@ class Collection:
 
     # Create collection summary
     #
-    with open(log_path+'/_{collection}.log'.format(collection=self.address), 'w') as log_file:
+    with open(log_path+'/{collection}.log'.format(collection=self.name), 'w') as log_file:
       log_file.write(dumps({
         'collection': self.name,
         'address': self.address,

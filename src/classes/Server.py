@@ -85,7 +85,7 @@ class Server:
 
     # Create server summary
     #
-    with open(log_path+'/_{server}.log'.format(server=self.name), 'w') as log_file:
+    with open(log_path+'/{server}.log'.format(server=self.name), 'w') as log_file:
       log_file.write(dumps({
         'server': self.name,
         'databases': list(map(

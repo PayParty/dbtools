@@ -13,7 +13,8 @@ def environment_select(args=None):
   user_input_valid = False
   while not user_input_valid:
     environment_input = input(
-      '(N) Create new environment   | (O) Open environment from file   | (X) Exit\n'
+      '(N) Create new environment       | (L) Log viewer\n' +
+      '(O) Open environment from file   | (X) Exit\n'
     )
 
     if environment_input in ['N', 'n']:
@@ -27,6 +28,10 @@ def environment_select(args=None):
       environment = environment_open()
       if environment:
         return ('environment_view', environment, True)
+
+    elif environment_input in ['L', 'l']:
+      user_input_valid = True
+      return ('analysis_view', 'logs', True)
 
     elif environment_input in ['X', 'x']:
       user_input_valid = True

@@ -3,6 +3,7 @@ from json import dumps, loads
 from pprint import pprint
 from datetime import datetime
 from os import mkdir
+from os.path import isdir
 
 class Environment:
 # Environment
@@ -57,7 +58,9 @@ class Environment:
 
     # Initialize logs
     #
-    log_path = self.filepath + str(datetime.now())
+    log_path = 'logs/{name}-{timestamp}'.format(name=self.name, timestamp=datetime.now().isoformat())
+    if not isdir('logs'):
+      mkdir('logs')
     mkdir(log_path)
 
     # Call analyze in servers
@@ -99,7 +102,7 @@ class Environment:
 
     # Create environment summary
     #
-    with open(log_path+'/_{environment}.log'.format(environment=self.name), 'w') as log_file:
+    with open(log_path+'/{environment}.log'.format(environment=self.name), 'w') as log_file:
       log_file.write(dumps({
         'environment': self.name,
         'servers': list(map(

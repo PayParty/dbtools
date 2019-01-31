@@ -44,7 +44,7 @@ class Database:
 
     # Initialize logs
     #
-    log_path = log_path + '/{database}'.format(database=self.address)
+    log_path = log_path + '/{database}'.format(database=self.name)
     mkdir(log_path)
 
     # Get database from client
@@ -79,7 +79,7 @@ class Database:
 
     # Create database summary
     #
-    with open(log_path+'/_{database}.log'.format(database=self.address), 'w') as log_file:
+    with open(log_path+'/{database}.log'.format(database=self.name), 'w') as log_file:
       log_file.write(dumps({
         'database': self.name,
         'address': self.address,
