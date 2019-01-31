@@ -62,57 +62,17 @@ class Collection:
       'Collection object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
 
-  def analyze(self, write, client):
+  def analyze(self, client):
 
     # Get cursor from client database
     #
     cursor = client[self.address].find({})
 
-    # Open collection in log file
-    #
-    write('object_start')
-    write('object_key', 'collection')
-    write('object_value', self.name)
-    write('object_key', 'documents')
-    write('array_start', True)
-
-    # Build documents
-    #
-    def analyze_document(document, write):
-
-      # Open document in log file
-      #
-      write('object_start')
-
-      # Write unexpected properties
-      #
-      def write_unexpected(prop_name, write):
-        
-        write('object_key', prop_name)
-        write('object_value', 'unexpected property')
-
-      _ = list(map(
-        lambda prop: prop.analyze(document.pop(prop.name, None), write)
-      , self.properties))
-
-      _ = list(map(
-        lambda prop: write_unexpected(prop[0], write)
-      , list(document.items())))
-
-      # Close document in log file
-      #
-      write('object_end')
-
     # Iterate documents in collection
     #
     _ = list(map(
-      lambda document: analyze_document(document, write)
+      lambda document: _(document)
     , cursor))
-
-    # Close collection in log file
-    #
-    write('array_end')
-    write('object_end')
 
   def to_plain(self):
   # to_plain

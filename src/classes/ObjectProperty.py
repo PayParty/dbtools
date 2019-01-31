@@ -40,43 +40,9 @@ class ObjectProperty:
       'ObjectProperty object \'{name}\' containing {prop_count} properties.'.format(name=self.name, prop_count=len(self.properties))
     )
   
-  def analyze(self, document_property, write):
+  def analyze(self, document_property):
 
-    # Create key in log file
-    #
-    write('object_key', self.name)
-
-    if document_property:
-
-      # Open object in log file
-      #
-      write('object_start', True)
-
-      # Write unexpected properties
-      #
-      def write_unexpected(prop_name, write):
-
-        write('object_key', prop_name)
-        write('object_value', 'unexpected property')
-
-      _ = list(map(
-        lambda prop: prop.analyze(document_property.pop(prop.name, None), write)
-      , self.properties))
-
-      _ = list(map(
-        lambda prop: write_unexpected(prop[0], write)
-      , list(document_property.items())))
-
-      # Close property in log file
-      #
-      write('object_end')
-
-    else:
-
-      if self.optional:
-        write('object_value', None)
-      else:
-        write('object_value', 'missing property')
+    pass
 
   def to_plain(self):
   # to_plain

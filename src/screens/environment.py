@@ -244,7 +244,7 @@ def environment_analyze(environment):
         user_done = True
         environment.targets = targets
         log_filepath = environment.analyze()
-        return ('analysis_view', log_filepath, False)
+        return ('analysis_success', log_filepath, False)
 
       # Select
       #

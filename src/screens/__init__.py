@@ -23,5 +23,5 @@ screens = {
   'property_new': property_new,
   'property_view': property_view,
 
-  'analysis_view': analysis_view
+  'analysis_success': analysis_success
 }

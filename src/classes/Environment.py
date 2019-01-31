@@ -61,122 +61,14 @@ class Environment:
     logfile.write('')
     logfile.close()
 
-    # This auxiliary function writes to the log file based on a
-    # set of actions, and makes use of external variables to
-    # keep track of the indentation level (and yes, I understand
-    # the negative consequences of this).
-    #
-    global indent
-    indent = 0
-    global first_element
-    first_element = True
-    def write_to_logs(filepath, action, data=None):
-
-      logfile = open(filepath, 'a')
-      global indent
-      global first_element
-
-      # 'object_start' represents an action to open a pair of
-      # curly braces, representing, in JSON, an object. The data
-      # argument of a call with this action represents the
-      # boolean value of whether this object is a value in a
-      # key-value pair
-      #
-      if action == 'object_start':
-        if not data and not first_element:
-          logfile.write(',')
-        logfile.write('{')
-        indent += 1
-        first_element = True
-
-      elif action == 'object_key':
-        if first_element:
-          first_element = False
-        else:
-          logfile.write(',')
-        logfile.write('\n{indent}\'{key}\': '.format(indent='  '*indent, key=str(data)))
-
-      elif action == 'object_value':
-        if isinstance(data, str):
-          logfile.write('\'{value}\''.format(value=data))
-        elif isinstance(data, int) or isinstance(data, float):
-          logfile.write('{value}'.format(value=str(data)))
-        elif isinstance(data, bool):
-          logfile.write('{value}'.format(value='true' if data else 'false'))
-        elif isinstance(data, type(None)):
-          logfile.write('null')
-        else:
-          try:
-            logfile.write('{value}'.format(value=str(data)))
-          except:
-            pass
-
-      elif action == 'object_end':
-        first_element = False
-        indent -= 1
-        logfile.write('\n{indent}}}'.format(indent='  '*indent))
-
-      # 'array_start' represents an action to open a pair of
-      # square brackets, representing, in JSON, an array. The data
-      # argument of a call with this action represents the boolean
-      # value of whether this array is a value in a key-value pair
-      #
-      elif action == 'array_start':
-        if not data and not first_element:
-          logfile.write(',')
-        logfile.write('[')
-        indent += 1
-        first_element = True
-
-      elif action == 'array_element':
-        if first_element:
-          first_element = False
-        else:
-          logfile.write(',')
-        logfile.write('\n{indent}'.format(indent='  '*indent))
-        if isinstance(data, str):
-          logfile.write('\'{value}\''.format(value=data))
-        elif isinstance(data, int) or isinstance(data, float):
-          logfile.write('{value}'.format(value=str(data)))
-        elif isinstance(data, bool):
-          logfile.write('{value}'.format(value='true' if data else 'false'))
-        elif isinstance(data, type(None)):
-          logfile.write('null')
-        else:
-          try:
-            logfile.write('{value}'.format(value=str(data)))
-          except:
-            pass
-
-      elif action == 'array_end':
-        first_element = False
-        indent -= 1
-        logfile.write('\n{indent}]'.format(indent='  '*indent))
-
-      logfile.close()
-
-    # Open environment in log file
-    #
-    write_to_logs(logfile_path, 'object_start')
-    write_to_logs(logfile_path, 'object_key', 'environment')
-    write_to_logs(logfile_path, 'object_value', self.name)
-    write_to_logs(logfile_path, 'object_key', 'servers')   
-    write_to_logs(logfile_path, 'array_start', True)
-
     # Call analyze in servers
     #
     target_servers = list(filter(
       lambda server: server.name in self.targets.keys()
     , self.servers))
     _ = list(map(
-      lambda server: server.analyze(targets=self.targets[server.name], write=lambda action, data=None: write_to_logs(logfile_path, action, data))
-    , target_servers))
+      lambda server: server.analyze(targets=self.targets[server.name], target_servers))
     
-    # Close environment in log file
-    #
-    write_to_logs(logfile_path, 'array_end')
-    write_to_logs(logfile_path, 'object_end')
-
     return logfile_path
   
   def to_plain(self):

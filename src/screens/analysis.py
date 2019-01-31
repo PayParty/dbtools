@@ -1,4 +1,4 @@
-def analysis_view(log_filepath):
+def analysis_success(log_filepath):
 
   print()
 

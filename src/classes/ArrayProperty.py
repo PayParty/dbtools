@@ -38,62 +38,10 @@ class ArrayProperty:
       'ArrayProperty object \'{name}\' of type {type}'.format(name=self.name, type=self.property_type)
     )
 
-  def analyze(self, document_property, write):
+  def analyze(self, document_property):
+
+    pass
     
-    # Create key in log file
-    #
-    write('object_key', self.name)
-
-    if document_property and isinstance(document_property, list):
-
-      # Open array in log file
-      #
-      write('array_start', True)
-
-      # Analyze and write elements
-      #
-      def write_element(element, write):
-
-        if self.property_type == 'Any':
-          write('array_element', None)
-        
-        elif self.property_type == 'ObjectID':
-          if isinstance(element, ObjectId):
-            write('array_element', None)
-          else:
-            write('array_element', 'invalid type')
-        
-        elif self.property_type == 'String':
-          if isinstance(element, str):
-            write('array_element', None)
-          else:
-            write('array_element', 'invalid type')
-        
-        elif self.property_type == 'Number':
-          if isinstance(element, int) or isinstance(element, float):
-            write('array_element', None)
-          else:
-            write('array_element', 'invalid type')
-        
-        elif self.property_type == 'Boolean':
-          if isinstance(element, bool):
-            write('array_element', None)
-          else:
-            write('array_element', 'invalid type')
-
-      # Analyze elements
-      #
-      _ = list(map(
-        lambda element: write_element(element, write)
-      , document_property))
-
-    else:
-
-      if self.optional:
-        write('object_value', None)
-      else:
-        write('object_value', 'missing property')
-
   def to_plain(self):
   # to_plain
   #

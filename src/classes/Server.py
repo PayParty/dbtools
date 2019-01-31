@@ -38,34 +38,21 @@ class Server:
       'Server object \'{name}\' containing {db_count} database(s).'.format(name=self.name, db_count=len(self.databases))
     )
 
-  def analyze(self, targets, write):
+  def analyze(self, targets):
 
     # Create connection to server
     #
     client = MongoClient(self.connection_string)
 
-    # Open server in log file
-    #
-    write('object_start')
-    write('object_key', 'server')
-    write('object_value', self.name)
-    write('object_key', 'databases')
-    write('array_start', True)
-
-    # Call analyze in databases
+   # Call analyze in databases
     #
     target_databases = list(filter(
       lambda database: database.name in targets.keys()
     , self.databases))
     _ = list(map(
-      lambda database: database.analyze(targets=targets[database.name], write=write, client=client)
+      lambda database: database.analyze(targets=targets[database.name], client=client)
     , target_databases))
 
-    # Close server in log file
-    #
-    write('array_end')
-    write('object_end')
-  
   def to_plain(self):
   # to_plain
   #
