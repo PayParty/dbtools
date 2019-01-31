@@ -88,14 +88,14 @@ class Collection:
 
       _ = list(map(
         lambda prop: add_result(document_results, prop.name, prop.analyze(document.pop(prop.name, None)))
-      , self.prop))
+      , self.properties))
 
       _ = list(map(
         lambda prop: add_result(document_results, prop[0], 'unexpected property')
       , list(document.items())))
 
       if any(list(document_results.values())):
-        with open(log_path+'/'+document_id+'.log', 'w') as log_file:
+        with open(log_path+'/'+str(document_id)+'.log', 'w') as log_file:
           log_file.write(dumps(document_results))
         
       issues = 0
@@ -117,7 +117,7 @@ class Collection:
     #
     issues_documents = 0
     try:
-      issues_documents += len(list(document_returns.items()))
+      issues_documents += len(document_returns)
     except:
       pass
     issues_properties = 0

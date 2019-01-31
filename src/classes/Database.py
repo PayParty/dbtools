@@ -63,7 +63,7 @@ class Database:
     #
     issues_collections = 0
     try:
-      issues_collections += len(list(collection_returns.items()))
+      issues_collections += len(collection_returns)
     except:
       pass
     issues_documents = 0
@@ -89,7 +89,7 @@ class Database:
             'address': collection.address
           }
         , self.collections)),
-        'analysisTargets': targets.keys(),
+        'analysisTargets': targets,
         'issues': {
           'collections': issues_collections,
           'documents': issues_documents,

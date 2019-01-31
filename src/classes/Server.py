@@ -64,7 +64,7 @@ class Server:
     #
     issues_databases = 0
     try:
-      issues_databases += len(list(database_returns.items()))
+      issues_databases += len(database_returns)
     except:
       pass
     issues_collections = 0
@@ -94,7 +94,7 @@ class Server:
             'address': database.address
           }
         , self.databases)),
-        'analysisTargets': targets.keys(),
+        'analysisTargets': list(targets.keys()),
         'issues': {
           'databases': issues_databases,
           'collections': issues_collections,

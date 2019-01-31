@@ -66,14 +66,14 @@ class Environment:
       lambda server: server.name in self.targets.keys()
     , self.servers))
     server_returns = list(map(
-      lambda server: server.analyze(self.targets[server.name], log_path))
-    , target_servers)
+      lambda server: server.analyze(self.targets[server.name], log_path)
+    , target_servers))
 
     # Count issues
     #
     issues_servers = 0
     try:
-      issues_servers += len(list(server_returns.items()))
+      issues_servers += len(server_returns)
     except:
       pass
     issues_databases = 0
@@ -105,7 +105,7 @@ class Environment:
         'servers': list(map(
           lambda server: server.name
         , self.servers)),
-        'analysisTargets': self.targets.keys(),
+        'analysisTargets': list(self.targets.keys()),
         'issues': {
           'servers': issues_servers,
           'databases': issues_databases,

@@ -3,7 +3,7 @@ from .screens import screens
 def app(args):
 # CLI loop
 #
-  try:
+  # try:
 
     screen_stack = [('environment_select', None, False)]
     if len(args) > 1:
@@ -21,5 +21,5 @@ def app(args):
 
     print('\n\n')
   
-  except Exception as error:
-    print('\n\n')
+  # except Exception as error:
+  #   print('\n\n')
