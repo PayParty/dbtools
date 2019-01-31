@@ -81,6 +81,7 @@ def analysis_view_environment(logs_path):
 
     with open(path_environment, 'r') as file_environment:
       data_environment = loads(file_environment.read())
+    del path_environment
 
     print(
       '  Environment {name}:\n'.format(name=data_environment['environment']) +
@@ -118,7 +119,60 @@ def analysis_view_environment(logs_path):
     return (None, None, False)
 
 def analysis_view_server(logs_path):
-  pass
+  
+  print()
+
+  dir_contents = listdir(logs_path)
+  dir_server = list(filter(
+    lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
+  , dir_contents))
+  dir_databases = list(filter(
+    lambda path: isdir('{logs}/{r_path}'.format(logs=logs_path, r_path=path))
+  , dir_contents))
+  del dir_contents
+
+  try:
+    
+    path_server = '{logs}/{r_path}'.format(logs=logs_path, r_path=dir_server[0])
+    del dir_server
+
+    with open(path_server, 'r') as file_server:
+      data_server = loads(file_server.read())
+    del path_server
+
+    print(
+      '  Server {name}:\n'.format(name=data_server['server']) +
+      '    {count} issues\n\n'.format(count=data_server['issues']['properties']) +
+      '  Databases:'
+    )
+
+    for i in range(0, len(dir_databases)):
+      print(
+        '    ({i}) {database}'.format(i=str(i).center(5, ' '), database=dir_databases[i])
+      )
+    print('\n')
+
+    user_input_valid = False
+    while not user_input_valid:
+      user_input = input(
+        '(O#) Open database by index   | (X) Back\n'
+      )
+
+      if user_input in ['X', 'x']:
+        return (None, None, False)
+      elif len(user_input) > 1:
+        if user_input[0] in ['O', 'o'] and user_input[1:].isdigit():
+          try:
+            return ('analysis_view_database', '{logs}/{log}'.format(logs=logs_path, log=dir_databases[int(user_input[1:])]), True)
+          except:
+            pass
+
+      print('\nInvalid input\n\n')
+      
+    return (None, None, False)
+  
+  except:
+    return (None, None, False)
 
 def analysis_view_database(logs_path):
   pass
