@@ -26,5 +26,8 @@ screens = {
   'analysis_success': analysis_success,
   'analysis_view': analysis_view,
   'analysis_view_environment': analysis_view_environment,
-  'analysis_view_server': analysis_view_server
+  'analysis_view_server': analysis_view_server,
+  'analysis_view_database': analysis_view_database,
+  'analysis_view_collection': analysis_view_collection,
+  'analysis_view_collection_detailed': analysis_view_collection_detailed
 }

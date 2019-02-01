@@ -175,10 +175,107 @@ def analysis_view_server(logs_path):
     return (None, None, False)
 
 def analysis_view_database(logs_path):
-  pass
+  
+  print()
+
+  dir_contents = listdir(logs_path)
+  dir_database = list(filter(
+    lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
+  , dir_contents))
+  dir_collections = list(filter(
+    lambda path: isdir('{logs}/{r_path}'.format(logs=logs_path, r_path=path))
+  , dir_contents))
+  del dir_contents
+
+  try:
+    
+    path_database = '{logs}/{r_path}'.format(logs=logs_path, r_path=dir_database[0])
+    del dir_database
+
+    with open(path_database, 'r') as file_database:
+      data_database = loads(file_database.read())
+    del path_database
+
+    print(
+      '  Database {name}:\n'.format(name=data_database['database']) +
+      '    {count} issues\n\n'.format(count=data_database['issues']['properties']) +
+      '  Collections:'
+    )
+
+    for i in range(0, len(dir_collections)):
+      print(
+        '    ({i}) {collection}'.format(i=str(i).center(5, ' '), collection=dir_collections[i])
+      )
+    print('\n')
+
+    user_input_valid = False
+    while not user_input_valid:
+      user_input = input(
+        '(O#) Open collection by index   | (X) Back\n'
+      )
+
+      if user_input in ['X', 'x']:
+        return (None, None, False)
+      elif len(user_input) > 1:
+        if user_input[0] in ['O', 'o'] and user_input[1:].isdigit():
+          try:
+            return ('analysis_view_collection', '{logs}/{log}'.format(logs=logs_path, log=dir_collections[int(user_input[1:])]), True)
+          except:
+            pass
+
+      print('\nInvalid input\n\n')
+      
+    return (None, None, False)
+  
+  except:
+    return (None, None, False)
 
 def analysis_view_collection(logs_path):
-  pass
+  
+  print()
+
+  dir_contents = listdir(logs_path)
+  dir_collection = list(filter(
+    lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
+  , dir_contents))
+  dir_documents = list(filter(
+    lambda path: isdir('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path == 'Documents'
+  , dir_contents))
+  del dir_contents
+
+  try:
+
+    path_collection = '{logs}/{r_path}'.format(logs=logs_path, r_path=dir_collection[0])
+    del dir_collection
+
+    with open(path_collection, 'r') as file_collection:
+      data_collection = loads(file_collection.read())
+    del path_collection
+
+    print(
+      '  Collection {collection}:\n'.format(collection=data_collection['collection']) +
+      '    {count} issues\n'.format(count=data_collection['issues']['properties'])
+    )
+
+    user_input_valid = False
+    while not user_input_valid:
+      user_input = input(
+        '(D) Load detailed analysis   | (X) Back\n'
+      )
+
+      if user_input in ['X', 'x']:
+        user_input_valid = True
+        return (None, None, False)
+      elif user_input in ['D', 'd']:
+        user_input_valid = True
+        return ('analysis_view_collection_detailed', logs_path, True)
+
+      print('\nInvalid input\n\n')
+
+    return (None, None, False)
+
+  except:
+    return (None, None, False)
 
 def analysis_view_collection_detailed(logs_path):
-  pass
+  return (None, None, False)
