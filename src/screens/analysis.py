@@ -6,6 +6,9 @@ def analysis_success(log_return):
 
   print()
 
+  # Show success message, path to logs output folder
+  # and summary of found issues in environment
+  #
   print(
     '\n  Analysis successful\n  Full logs saved in {log_path}'.format(log_path=log_return['path']) +
     '\n  Close environment to view logs\n  Issues found:'+
@@ -65,6 +68,8 @@ def analysis_view_environment(logs_path):
   
   print()
 
+  # Get paths of environment log file and server log directories
+  #
   dir_contents = listdir(logs_path)
   dir_environment = list(filter(
     lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
@@ -79,22 +84,30 @@ def analysis_view_environment(logs_path):
     path_environment = '{logs}/{r_path}'.format(logs=logs_path, r_path=dir_environment[0]) 
     del dir_environment
 
+    # Try to open environment log file
+    #
     with open(path_environment, 'r') as file_environment:
       data_environment = loads(file_environment.read())
     del path_environment
 
+    # Print environment summary
+    #
     print(
       '  Environment {name}:\n'.format(name=data_environment['environment']) +
       '    {count} issues\n\n'.format(count=data_environment['issues']['properties']) +
       '  Servers:'
     )
 
+    # Print servers
+    #
     for i in range(0, len(dir_servers)):
       print(
         '    ({i}) {server}'.format(i=str(i).center(5, ' '), server=dir_servers[i])
       )
     print('\n')
 
+    # User
+    #
     user_input_valid = False
     while not user_input_valid:
       user_input = input(
@@ -120,6 +133,8 @@ def analysis_view_environment(logs_path):
 
 def analysis_view_server(logs_path):
   
+  # Same logic as analysis_view_environment, see above
+  #
   print()
 
   dir_contents = listdir(logs_path)
@@ -238,9 +253,6 @@ def analysis_view_collection(logs_path):
   dir_collection = list(filter(
     lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
   , dir_contents))
-  dir_documents = list(filter(
-    lambda path: isdir('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path == 'Documents'
-  , dir_contents))
   del dir_contents
 
   try:
@@ -268,7 +280,7 @@ def analysis_view_collection(logs_path):
         return (None, None, False)
       elif user_input in ['D', 'd']:
         user_input_valid = True
-        return ('analysis_view_collection_detailed', logs_path, True)
+        return ('analysis_view_collection_detailed', logs_path, False)
 
       print('\nInvalid input\n\n')
 
@@ -278,4 +290,86 @@ def analysis_view_collection(logs_path):
     return (None, None, False)
 
 def analysis_view_collection_detailed(logs_path):
-  return (None, None, False)
+
+  print ()
+
+  # Get collection log
+  #
+  dir_contents = listdir(logs_path)
+  dir_collection = list(filter(
+    lambda path: isfile('{logs}/{r_path}'.format(logs=logs_path, r_path=path)) and path.endswith('.log')
+  , dir_contents))
+  del dir_contents
+  try:
+    path_collection = '{logs}/{r_path}'.format(logs=logs_path, r_path=dir_collection[0])
+    del dir_collection
+    with open(path_collection, 'r') as file_collection:
+      data_collection = loads(file_collection.read())
+    del path_collection
+  except:
+    return (None, None, False)
+
+  path_documents = '{logs}/Documents'.format(logs=logs_path)
+
+  # Get paths of document logs
+  #
+  dir_contents = listdir(path_documents)
+  dir_documents = list(filter(
+    lambda path: isfile('{logs}/{r_path}'.format(logs=path_documents, r_path=path)) and path.endswith('.log')
+  , dir_contents))
+  del dir_contents
+
+  try:
+    
+    # Initialize issues dict
+    #
+    issues = dict()
+
+    # Iterate documents with json.loads and build issues dict
+    # 
+    for document in dir_documents:
+      with open('{logs}/{document}'.format(logs=path_documents, document=document), 'r') as file_document:
+        data_document = loads(file_document.read())
+        for key in data_document.keys():
+          if not data_document[key] == None:
+            issues.setdefault(key, dict())
+            issues[key].setdefault(data_document[key], 0)
+            issues[key][data_document[key]] += 1
+
+    # Re-print collection summary
+    #
+    print(
+       '  Collection {collection}:\n'.format(collection=data_collection['collection']) +
+       '    {count} issues\n\n'.format(count=data_collection['issues']['properties']) +
+       '  Properties:'
+    )
+
+    # Print issues
+    #
+    for prop in issues.keys():
+      print(
+        '    {prop_name} ({count} issues):'.format(prop_name=prop, count=sum(issues[prop].values()))
+      )
+      for issue in issues[prop].keys():
+        print(
+          '    | {issue_text} ({count} occurences)'.format(issue_text=issue, count=issues[prop][issue])
+        )
+    print('\n')
+    
+    # User
+    #
+    user_input_valid = False
+    while not user_input_valid:
+      user_input = input(
+        '(X) Back\n'
+      )
+      if user_input in ['X', 'x']:
+        user_input_valid = True
+        return (None, None, False)
+      
+      print('\nInvalid input\n\n')
+
+    return (None, None, False)
+
+  except:
+    return (None, None, False)
