@@ -116,8 +116,8 @@ class Database:
     return {
       '__class': self.__class,
       'name': self.name,
-      'collections': plain_collections,
-      'address': self.address
+      'address': self.address,
+      'collections': plain_collections
     }
 
   @property

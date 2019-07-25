@@ -84,8 +84,8 @@ class ObjectProperty:
       '__class': self.__class,
       'name': self.name,
       'type': self.type,
-      'properties': plain_properties,
-      'optional': self.optional
+      'optional': self.optional,
+      'properties': plain_properties
     }
 
   @property

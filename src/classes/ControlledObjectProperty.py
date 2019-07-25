@@ -100,8 +100,8 @@ class ControlledObjectProperty:
       '__class': self.__class,
       'name': self.name,
       'controller': self.controller.to_plain(),
-      'properties': plain_properties,
-      'optional': self.optional
+      'optional': self.optional,
+      'properties': plain_properties
     }
 
   @property
