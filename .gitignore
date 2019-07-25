@@ -1,6 +1,9 @@
 # pycaches
 **/__pycache__/**
 
+# env files
+envs/
+
 # test files
 test*
 
