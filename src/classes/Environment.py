@@ -142,8 +142,8 @@ class Environment:
     return {
       '__class': self.__class,
       'name': self.name,
-      'servers': plain_servers,
       'filepath': self.filepath,
+      'servers': plain_servers,
       'targets': dumps(self.targets)
     }
   

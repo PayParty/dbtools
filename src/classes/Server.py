@@ -123,8 +123,8 @@ class Server:
     return {
       '__class': self.__class,
       'name': self.name,
-      'databases': plain_databases,
-      'connection_string': self.connection_string
+      'connection_string': self.connection_string,
+      'databases': plain_databases
     }
   
   @property
