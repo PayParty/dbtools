@@ -157,8 +157,8 @@ class Collection:
     return {
       '__class': self.__class,
       'name': self.name,
-      'properties': plain_properties,
-      'address': self.address
+      'address': self.address,
+      'properties': plain_properties
     }
   
   @property
