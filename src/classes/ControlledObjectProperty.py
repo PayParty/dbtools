@@ -59,10 +59,10 @@ class ControlledObjectProperty:
 
     else:
 
-      if not document_property.controller:
+      if not document_property.get(self.controller.name, False):
         return 'missing controller'
       else:
-        if not isinstance(document_property.controller, bool):
+        if not isinstance(document_property.get(self.controller.name, False), bool):
           return 'incorrect controller type'
 
         else:
